@@ -29,7 +29,7 @@
     <PackageReference Include="System.ServiceModel.Security" Version="4.7.0" />
     <PackageReference Include="System.Private.ServiceModel" Version="4.7.0" />
     <!-- the source could not be found for the following package(s) -->
-    <PackageReference Include="Microsoft.NETCore.Windows.ApiSets" Version="1.0.1" />
+    <PackageReference Include="Microsoft.NETCore.Windows.ApiSets" Version="12.1.0.17009493" />
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.0-preview.5.20268.11" />
   </ItemGroup>
 
