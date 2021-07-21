@@ -14,7 +14,7 @@ using Microsoft.PowerShell;
 
 namespace System.Management.Automation.Language
 {
-    internal class TypeDefiner
+    internal static class TypeDefiner
     {
         internal const string DynamicClassAssemblyName = "PowerShell Class Assembly";
         internal const string DynamicClassAssemblyFullNamePrefix = "PowerShell Class Assembly,";
@@ -110,7 +110,7 @@ namespace System.Management.Automation.Language
                 // This inconsistent behavior affects OneCore powershell because we are using the extension method here when compiling
                 // against CoreCLR. So we need to add a null check until this is fixed in CLR.
                 var paramArrayAttrs = parameterInfo[argIndex].GetCustomAttributes(typeof(ParamArrayAttribute), true);
-                if (paramArrayAttrs != null && paramArrayAttrs.Any() && expandParamsOnBest)
+                if (paramArrayAttrs != null && paramArrayAttrs.Length > 0 && expandParamsOnBest)
                 {
                     var elementType = parameterInfo[argIndex].ParameterType.GetElementType();
                     var paramsArray = Array.CreateInstance(elementType, positionalArgCount - argIndex);
@@ -265,7 +265,7 @@ namespace System.Management.Automation.Language
             }
         }
 
-        private class DefineTypeHelper
+        private sealed class DefineTypeHelper
         {
             private readonly Parser _parser;
             internal readonly TypeDefinitionAst _typeDefinitionAst;
@@ -323,7 +323,7 @@ namespace System.Management.Automation.Language
 
                 // Default base class is System.Object and it has a default ctor.
                 _baseClassHasDefaultCtor = true;
-                if (typeDefinitionAst.BaseTypes.Any())
+                if (typeDefinitionAst.BaseTypes.Count > 0)
                 {
                     // base class
                     var baseTypeAsts = typeDefinitionAst.BaseTypes;
@@ -349,7 +349,6 @@ namespace System.Management.Automation.Language
                             // fall to the default base type
                         }
                         else
-
                         {
                             if (baseClass.IsSealed)
                             {
@@ -551,7 +550,7 @@ namespace System.Management.Automation.Language
 
                 if (needDefaultCtor)
                 {
-                    needDefaultCtor = !instanceCtors.Any();
+                    needDefaultCtor = instanceCtors.Count == 0;
                 }
 
                 //// Now we can decide to create explicit default ctors or report error.
@@ -572,7 +571,7 @@ namespace System.Management.Automation.Language
                 }
                 else
                 {
-                    if (!instanceCtors.Any())
+                    if (instanceCtors.Count == 0)
                     {
                         _parser.ReportError(_typeDefinitionAst.Extent,
                             nameof(ParserStrings.BaseClassNoDefaultCtor),
@@ -839,7 +838,7 @@ namespace System.Management.Automation.Language
                         var parameters = functionMemberAst.Parameters;
                         if (parameters.Count > 0)
                         {
-                            IScriptExtent errorExtent = Parser.ExtentOf(parameters.First(), parameters.Last());
+                            IScriptExtent errorExtent = Parser.ExtentOf(parameters[0], parameters.Last());
                             _parser.ReportError(errorExtent,
                                 nameof(ParserStrings.StaticConstructorCantHaveParameters),
                                 ParserStrings.StaticConstructorCantHaveParameters);
@@ -889,7 +888,7 @@ namespace System.Management.Automation.Language
                 }
 
                 var ilGenerator = method.GetILGenerator();
-                DefineMethodBody(functionMemberAst, ilGenerator, GetMetaDataName(method.Name, parameterTypes.Count()), functionMemberAst.IsStatic, parameterTypes, returnType,
+                DefineMethodBody(functionMemberAst, ilGenerator, GetMetaDataName(method.Name, parameterTypes.Length), functionMemberAst.IsStatic, parameterTypes, returnType,
                     (i, n) => method.DefineParameter(i, ParameterAttributes.None, n));
             }
 
@@ -918,11 +917,11 @@ namespace System.Management.Automation.Language
                     ilGenerator.Emit(OpCodes.Stfld, _sessionStateField);
                 }
 
-                DefineMethodBody(ipmp, ilGenerator, GetMetaDataName(ctor.Name, parameterTypes.Count()), isStatic, parameterTypes, typeof(void),
+                DefineMethodBody(ipmp, ilGenerator, GetMetaDataName(ctor.Name, parameterTypes.Length), isStatic, parameterTypes, typeof(void),
                     (i, n) => ctor.DefineParameter(i, ParameterAttributes.None, n));
             }
 
-            private string GetMetaDataName(string name, int numberOfParameters)
+            private static string GetMetaDataName(string name, int numberOfParameters)
             {
                 int currentId = Interlocked.Increment(ref s_globalCounter);
                 string metaDataName = name + "_" + numberOfParameters + "_" + currentId;
@@ -1008,7 +1007,7 @@ namespace System.Management.Automation.Language
             }
         }
 
-        private class DefineEnumHelper
+        private sealed class DefineEnumHelper
         {
             private readonly Parser _parser;
             private readonly TypeDefinitionAst _enumDefinitionAst;
@@ -1083,7 +1082,7 @@ namespace System.Management.Automation.Language
                         }
 
                         // The expression may have multiple member expressions, e.g. [E]::e1 + [E]::e2
-                        foreach (var memberExpr in initExpr.FindAll(ast => ast is MemberExpressionAst, false))
+                        foreach (var memberExpr in initExpr.FindAll(static ast => ast is MemberExpressionAst, false))
                         {
                             var typeExpr = ((MemberExpressionAst)memberExpr).Expression as TypeExpressionAst;
                             if (typeExpr != null)
@@ -1412,7 +1411,7 @@ namespace System.Management.Automation.Language
             {
                 if (parent is IParameterMetadataProvider)
                 {
-                    nameParts = nameParts ?? new List<string>();
+                    nameParts ??= new List<string>();
                     var fnDefn = parent.Parent as FunctionDefinitionAst;
                     if (fnDefn != null)
                     {
@@ -1438,7 +1437,7 @@ namespace System.Management.Automation.Language
             return string.Join(".", nameParts);
         }
 
-        private static OpCode[] s_ldc =
+        private static readonly OpCode[] s_ldc =
         {
             OpCodes.Ldc_I4_0, OpCodes.Ldc_I4_1, OpCodes.Ldc_I4_2, OpCodes.Ldc_I4_3, OpCodes.Ldc_I4_4,
             OpCodes.Ldc_I4_5, OpCodes.Ldc_I4_6, OpCodes.Ldc_I4_7, OpCodes.Ldc_I4_8
@@ -1456,7 +1455,7 @@ namespace System.Management.Automation.Language
             }
         }
 
-        private static OpCode[] s_ldarg =
+        private static readonly OpCode[] s_ldarg =
         {
             OpCodes.Ldarg_0, OpCodes.Ldarg_1, OpCodes.Ldarg_2, OpCodes.Ldarg_3
         };

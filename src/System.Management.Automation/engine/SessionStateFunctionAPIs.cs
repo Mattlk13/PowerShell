@@ -116,12 +116,15 @@ namespace System.Management.Automation
         /// </summary>
         internal bool FunctionsExportedWithWildcard
         {
-            get { return _functionsExportedWithWildcard; }
+            get
+            {
+                return _functionsExportedWithWildcard;
+            }
 
             set
             {
-                Dbg.Assert((value == true), "This property should never be set/reset to false");
-                if (value == true)
+                Dbg.Assert((value), "This property should never be set/reset to false");
+                if (value)
                 {
                     _functionsExportedWithWildcard = value;
                 }
@@ -220,7 +223,7 @@ namespace System.Management.Automation
             return GetFunction(name, CommandOrigin.Internal);
         }
 
-        private IEnumerable<string> GetFunctionAliases(IParameterMetadataProvider ipmp)
+        private static IEnumerable<string> GetFunctionAliases(IParameterMetadataProvider ipmp)
         {
             if (ipmp == null || ipmp.Body.ParamBlock == null)
                 yield break;

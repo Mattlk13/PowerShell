@@ -170,7 +170,7 @@ namespace System.Management.Automation
                 return;
             }
 
-            if (string.Compare(result.Name, drive.Name, StringComparison.OrdinalIgnoreCase) == 0)
+            if (string.Equals(result.Name, drive.Name, StringComparison.OrdinalIgnoreCase))
             {
                 // Set the drive in the current scope.
 
@@ -251,7 +251,7 @@ namespace System.Management.Automation
             return result;
         }
 
-        private static char[] s_charactersInvalidInDriveName = new char[] { ':', '/', '\\', '.', '~' };
+        private static readonly char[] s_charactersInvalidInDriveName = new char[] { ':', '/', '\\', '.', '~' };
 
         /// <summary>
         /// Tries to resolve the drive root as an MSH path. If it successfully resolves
@@ -473,13 +473,9 @@ namespace System.Management.Automation
 
             if (result == null && automount)
             {
-                // first try to automount as a file system drive
-                result = AutomountFileSystemDrive(name);
-                // if it didn't work, then try automounting as a BuiltIn drive (e.g. "Cert"/"Certificate"/"WSMan")
-                if (result == null)
-                {
-                    result = AutomountBuiltInDrive(name); // internally this calls GetDrive(name, false)
-                }
+                // Attempt to automount as a file system drive
+                // or as a BuiltIn drive (e.g. "Cert"/"Certificate"/"WSMan")
+                result = AutomountFileSystemDrive(name) ?? AutomountBuiltInDrive(name);
             }
 
             if (result == null)
@@ -744,6 +740,9 @@ namespace System.Management.Automation
         /// <summary>
         /// Auto-mounts a built-in drive.
         /// </summary>
+        /// <remarks>
+        /// Calls GetDrive(name, false) internally.
+        /// </remarks>
         /// <param name="name">The name of the drive to load.</param>
         /// <returns></returns>
         internal PSDriveInfo AutomountBuiltInDrive(string name)
@@ -1205,8 +1204,7 @@ namespace System.Management.Automation
             else
             {
                 PSInvalidOperationException e =
-                    (PSInvalidOperationException)
-                    PSTraceSource.NewInvalidOperationException(
+                    (PSInvalidOperationException)PSTraceSource.NewInvalidOperationException(
                         SessionStateStrings.DriveRemovalPreventedByProvider,
                         drive.Name,
                         drive.Provider);
@@ -1295,7 +1293,7 @@ namespace System.Management.Automation
                 // Make sure the provider didn't try to pull a fast one on us
                 // and substitute a different drive.
 
-                if (string.Compare(result.Name, drive.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Equals(result.Name, drive.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     driveRemovable = true;
                 }

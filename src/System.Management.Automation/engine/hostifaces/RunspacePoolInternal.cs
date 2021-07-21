@@ -40,7 +40,7 @@ namespace System.Management.Automation.Runspaces.Internal
 
         private static readonly TimeSpan s_defaultCleanupPeriod = new TimeSpan(0, 15, 0);   // 15 minutes.
         private TimeSpan _cleanupInterval;
-        private Timer _cleanupTimer;
+        private readonly Timer _cleanupTimer;
 
         #endregion
 
@@ -276,7 +276,10 @@ namespace System.Management.Automation.Runspaces.Internal
         /// </summary>
         public TimeSpan CleanupInterval
         {
-            get { return _cleanupInterval; }
+            get
+            {
+                return _cleanupInterval;
+            }
 
             set
             {
@@ -1332,7 +1335,7 @@ namespace System.Management.Automation.Runspaces.Internal
                 Runspace runspaceToDestroy = null;
                 lock (pool)
                 {
-                    if (pool.Count <= 0)
+                    if (pool.Count == 0)
                     {
                         break; // break from while
                     }
@@ -1510,7 +1513,7 @@ namespace System.Management.Automation.Runspaces.Internal
 
             try
             {
-                do
+                while (true)
                 {
                     lock (ultimateRequestQueue)
                     {
@@ -1591,7 +1594,7 @@ namespace System.Management.Automation.Runspaces.Internal
                             ultimateRequestQueue.Enqueue(runspaceRequestQueue.Dequeue());
                         }
                     }
-                } while (true);
+                }
             endOuterWhile:;
             }
             finally
@@ -1640,12 +1643,7 @@ namespace System.Management.Automation.Runspaces.Internal
         /// </summary>
         protected virtual void OnForwardEvent(PSEventArgs e)
         {
-            EventHandler<PSEventArgs> eh = this.ForwardEvent;
-
-            if (eh != null)
-            {
-                eh(this, e);
-            }
+            this.ForwardEvent?.Invoke(this, e);
         }
 
         /// <summary>

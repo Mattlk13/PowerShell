@@ -224,7 +224,7 @@ namespace System.Management.Automation
                 _associatedShells.Add(dsHandler.PowerShellId, dsHandler);
             }
 
-            dsHandler.RemoveAssociation += new EventHandler(HandleRemoveAssociation);
+            dsHandler.RemoveAssociation += HandleRemoveAssociation;
 
             return dsHandler;
         }
@@ -409,17 +409,18 @@ namespace System.Management.Automation
 
         #region Private Members
 
-        private Guid _clientRunspacePoolId;
+        private readonly Guid _clientRunspacePoolId;
         // transport manager using which this
         // runspace pool driver handles all client
         // communication
-        private AbstractServerSessionTransportManager _transportManager;
+        private readonly AbstractServerSessionTransportManager _transportManager;
 
-        private Dictionary<Guid, ServerPowerShellDataStructureHandler> _associatedShells
+        private readonly Dictionary<Guid, ServerPowerShellDataStructureHandler> _associatedShells
             = new Dictionary<Guid, ServerPowerShellDataStructureHandler>();
+
         // powershell data structure handlers associated with this
         // runspace pool data structure handler
-        private object _associationSyncObject = new object();
+        private readonly object _associationSyncObject = new object();
         // object to synchronize operations to above
 
         #endregion Private Members
@@ -435,10 +436,10 @@ namespace System.Management.Automation
         // transport manager using which this
         // powershell driver handles all client
         // communication
-        private AbstractServerTransportManager _transportManager;
-        private Guid _clientRunspacePoolId;
-        private Guid _clientPowerShellId;
-        private RemoteStreamOptions _streamSerializationOptions;
+        private readonly AbstractServerTransportManager _transportManager;
+        private readonly Guid _clientRunspacePoolId;
+        private readonly Guid _clientPowerShellId;
+        private readonly RemoteStreamOptions _streamSerializationOptions;
         private Runspace _rsUsedToInvokePowerShell;
 
         #endregion Private Members
@@ -465,8 +466,7 @@ namespace System.Management.Automation
 
             if (localPowerShell != null)
             {
-                localPowerShell.RunspaceAssigned +=
-                    new EventHandler<PSEventArgs<Runspace>>(LocalPowerShell_RunspaceAssigned);
+                localPowerShell.RunspaceAssigned += LocalPowerShell_RunspaceAssigned;
             }
         }
 

@@ -32,6 +32,10 @@ namespace System.Management.Automation
 
         internal static readonly VariablePath OFSVarPath = new VariablePath(OFS);
 
+        internal const string PSStyle = "PSStyle";
+
+        internal static readonly VariablePath PSStyleVarPath = new VariablePath(PSStyle);
+
         internal const string OutputEncoding = "OutputEncoding";
 
         internal static readonly VariablePath OutputEncodingVarPath = new VariablePath(OutputEncoding);
@@ -181,40 +185,40 @@ namespace System.Management.Automation
 
         internal const string pwd = "PWD";
 
-        internal static VariablePath PWDVarPath = new VariablePath("global:" + pwd);
+        internal static readonly VariablePath PWDVarPath = new VariablePath("global:" + pwd);
 
         internal const string Null = "null";
 
-        internal static VariablePath NullVarPath = new VariablePath("null");
+        internal static readonly VariablePath NullVarPath = new VariablePath("null");
 
         internal const string True = "true";
 
-        internal static VariablePath TrueVarPath = new VariablePath("true");
+        internal static readonly VariablePath TrueVarPath = new VariablePath("true");
 
         internal const string False = "false";
 
-        internal static VariablePath FalseVarPath = new VariablePath("false");
+        internal static readonly VariablePath FalseVarPath = new VariablePath("false");
 
         internal const string PSModuleAutoLoading = "PSModuleAutoLoadingPreference";
 
-        internal static VariablePath PSModuleAutoLoadingPreferenceVarPath = new VariablePath("global:" + PSModuleAutoLoading);
+        internal static readonly VariablePath PSModuleAutoLoadingPreferenceVarPath = new VariablePath("global:" + PSModuleAutoLoading);
 
         #region Platform Variables
         internal const string IsLinux = "IsLinux";
 
-        internal static VariablePath IsLinuxPath = new VariablePath("IsLinux");
+        internal static readonly VariablePath IsLinuxPath = new VariablePath("IsLinux");
 
         internal const string IsMacOS = "IsMacOS";
 
-        internal static VariablePath IsMacOSPath = new VariablePath("IsMacOS");
+        internal static readonly VariablePath IsMacOSPath = new VariablePath("IsMacOS");
 
         internal const string IsWindows = "IsWindows";
 
-        internal static VariablePath IsWindowsPath = new VariablePath("IsWindows");
+        internal static readonly VariablePath IsWindowsPath = new VariablePath("IsWindows");
 
         internal const string IsCoreCLR = "IsCoreCLR";
 
-        internal static VariablePath IsCoreCLRPath = new VariablePath("IsCoreCLR");
+        internal static readonly VariablePath IsCoreCLRPath = new VariablePath("IsCoreCLR");
 
         #endregion
         #region Preference Variables
@@ -252,6 +256,11 @@ namespace System.Management.Automation
         internal static readonly VariablePath InformationPreferenceVarPath = new VariablePath(InformationPreference);
 
         #endregion Preference Variables
+
+        // Native command argument passing style
+        internal const string NativeArgumentPassing = "PSNativeCommandArgumentPassing";
+
+        internal static readonly VariablePath NativeArgumentPassingVarPath = new VariablePath(NativeArgumentPassing);
 
         internal const string ErrorView = "ErrorView";
 

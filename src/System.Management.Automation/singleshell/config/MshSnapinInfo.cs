@@ -262,8 +262,8 @@ namespace System.Management.Automation
         /// </summary>
         public Collection<string> Formats { get; }
 
-        private string _descriptionIndirect;
-        private string _descriptionFallback = string.Empty;
+        private readonly string _descriptionIndirect;
+        private readonly string _descriptionFallback = string.Empty;
         private string _description;
         /// <summary>
         /// Description of mshsnapin.
@@ -281,8 +281,8 @@ namespace System.Management.Automation
             }
         }
 
-        private string _vendorIndirect;
-        private string _vendorFallback = string.Empty;
+        private readonly string _vendorIndirect;
+        private readonly string _vendorFallback = string.Empty;
         private string _vendor;
         /// <summary>
         /// Vendor of mshsnapin.
@@ -725,7 +725,7 @@ namespace System.Management.Automation
             string logPipelineExecutionDetailsStr = ReadStringValue(mshsnapinKey, RegistryStrings.MshSnapin_LogPipelineExecutionDetails, false);
             if (!string.IsNullOrEmpty(logPipelineExecutionDetailsStr))
             {
-                if (string.Compare("1", logPipelineExecutionDetailsStr, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Equals("1", logPipelineExecutionDetailsStr, StringComparison.OrdinalIgnoreCase))
                     logPipelineExecutionDetails = true;
             }
 
@@ -816,7 +816,7 @@ namespace System.Management.Automation
             Dbg.Assert(mshsnapinKey != null, "Caller should validate the parameter");
 
             object value = mshsnapinKey.GetValue(name);
-            if (value == null && mandatory == true)
+            if (value == null && mandatory)
             {
                 s_mshsnapinTracer.TraceError("Mandatory property {0} not specified for registry key {1}",
                         name, mshsnapinKey.Name);
@@ -824,7 +824,7 @@ namespace System.Management.Automation
             }
 
             string s = value as string;
-            if (string.IsNullOrEmpty(s) && mandatory == true)
+            if (string.IsNullOrEmpty(s) && mandatory)
             {
                 s_mshsnapinTracer.TraceError("Value is null or empty for mandatory property {0} in {1}",
                         name, mshsnapinKey.Name);
@@ -954,8 +954,8 @@ namespace System.Management.Automation
             // System.Management.Automation formats & types files
             Collection<string> types = new Collection<string>(new string[] { "types.ps1xml", "typesv3.ps1xml" });
             Collection<string> formats = new Collection<string>(new string[]
-                        {"Certificate.format.ps1xml","DotNetTypes.format.ps1xml","FileSystem.format.ps1xml",
-                         "Help.format.ps1xml","HelpV3.format.ps1xml","PowerShellCore.format.ps1xml","PowerShellTrace.format.ps1xml",
+                        {"Certificate.format.ps1xml", "DotNetTypes.format.ps1xml", "FileSystem.format.ps1xml",
+                         "Help.format.ps1xml", "HelpV3.format.ps1xml", "PowerShellCore.format.ps1xml", "PowerShellTrace.format.ps1xml",
                          "Registry.format.ps1xml"});
 
             string strongName = string.Format(CultureInfo.InvariantCulture, "{0}, Version={1}, Culture={2}, PublicKeyToken={3}, ProcessorArchitecture={4}",
@@ -1007,8 +1007,8 @@ namespace System.Management.Automation
 
             // System.Management.Automation formats & types files
             Collection<string> smaFormats = new Collection<string>(new string[]
-                        {"Certificate.format.ps1xml","DotNetTypes.format.ps1xml","FileSystem.format.ps1xml",
-                         "Help.format.ps1xml","HelpV3.format.ps1xml","PowerShellCore.format.ps1xml","PowerShellTrace.format.ps1xml",
+                        {"Certificate.format.ps1xml", "DotNetTypes.format.ps1xml", "FileSystem.format.ps1xml",
+                         "Help.format.ps1xml", "HelpV3.format.ps1xml", "PowerShellCore.format.ps1xml", "PowerShellTrace.format.ps1xml",
                          "Registry.format.ps1xml"});
             Collection<string> smaTypes = new Collection<string>(new string[] { "types.ps1xml", "typesv3.ps1xml" });
 
@@ -1305,18 +1305,18 @@ namespace System.Management.Automation
                                     "GetEventResources,Description", "GetEventResources,Vendor"),
 #endif
                                 new DefaultPSSnapInInformation("Microsoft.PowerShell.Host", "Microsoft.PowerShell.ConsoleHost", null,
-                                    "HostMshSnapInResources,Description","HostMshSnapInResources,Vendor"),
+                                    "HostMshSnapInResources,Description", "HostMshSnapInResources,Vendor"),
 
                                 s_coreSnapin,
 
                                 new DefaultPSSnapInInformation("Microsoft.PowerShell.Utility", "Microsoft.PowerShell.Commands.Utility", null,
-                                    "UtilityMshSnapInResources,Description","UtilityMshSnapInResources,Vendor"),
+                                    "UtilityMshSnapInResources,Description", "UtilityMshSnapInResources,Vendor"),
 
                                 new DefaultPSSnapInInformation("Microsoft.PowerShell.Management", "Microsoft.PowerShell.Commands.Management", null,
-                                    "ManagementMshSnapInResources,Description","ManagementMshSnapInResources,Vendor"),
+                                    "ManagementMshSnapInResources,Description", "ManagementMshSnapInResources,Vendor"),
 
                                 new DefaultPSSnapInInformation("Microsoft.PowerShell.Security", "Microsoft.PowerShell.Security", null,
-                                    "SecurityMshSnapInResources,Description","SecurityMshSnapInResources,Vendor")
+                                    "SecurityMshSnapInResources,Description", "SecurityMshSnapInResources,Vendor")
                             };
 
 #if !UNIX
@@ -1335,11 +1335,10 @@ namespace System.Management.Automation
         }
 
         private static IList<DefaultPSSnapInInformation> s_defaultMshSnapins = null;
-        private static object s_syncObject = new object();
+        private static readonly object s_syncObject = new object();
 
         #endregion
 
-        private static PSTraceSource s_mshsnapinTracer = PSTraceSource.GetTracer("MshSnapinLoadUnload", "Loading and unloading mshsnapins", false);
+        private static readonly PSTraceSource s_mshsnapinTracer = PSTraceSource.GetTracer("MshSnapinLoadUnload", "Loading and unloading mshsnapins", false);
     }
 }
-
